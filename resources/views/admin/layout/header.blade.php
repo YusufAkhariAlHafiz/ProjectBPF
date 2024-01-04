@@ -57,7 +57,7 @@
                 <li class="nav-item border-bottom pb-4">
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="("auth/logout")">
+                    <a class="nav-link" href="{{route('logout')}}">
                         <i class="mdi mdi-logout menu-icon"></i>
                         <span class="menu-title">Log Out</span>
                     </a>

@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -56,7 +55,7 @@ class AdminController extends Controller
         $data['email'] = $request->email;
         $data['role'] = $request->role;
         $data['status'] = "enable";
-        $user = User::create($data);
+        $user = Users::create($data);
 
         if (!$user) {
             return redirect(route('addUser'))->with("error", "Detail registrasi tidak valid");
@@ -103,7 +102,7 @@ class AdminController extends Controller
         }else{
             return redirect(route('dosen'));
         }
-        
+
     }
 
     /**
@@ -112,7 +111,7 @@ class AdminController extends Controller
     public function disable(string $id)
     {
         // mengambil data user berdasarkan id yang dikirim
-        $user = User::find($id);
+        $user = Users::find($id);
 
         // update status user menjadi disable
         $user->status = 'disable';
@@ -130,7 +129,7 @@ class AdminController extends Controller
 
     public function enable(string $id){
         // mengambil data user berdasarkan id yang dikirim
-        $user = User::find($id);
+        $user = Users::find($id);
 
         // update status user menjadi disable
         $user->status = 'enable';
