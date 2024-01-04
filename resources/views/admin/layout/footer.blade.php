@@ -36,13 +36,9 @@
     <script src="{{asset('template/assets/js/dashboard.js')}}"></script>
     <!-- End custom js for this page -->
     <script src="https://kit.fontawesome.com/098ceb860a.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+
+    <!-- datatable -->
     
-    <script>
-        $(document).ready(function() {
-            $('#myTable').DataTable();
-        });
-    </script>
 
     <script>
         var myModal = document.getElementById('myModal')

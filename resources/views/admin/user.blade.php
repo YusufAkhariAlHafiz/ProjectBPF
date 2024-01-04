@@ -33,28 +33,34 @@
                                 @foreach($user as $p)
                                 <tbody>
                                     <tr>
-                                        <td>{{ $p->nama }}</td>
+                                        <td>{{ $p->name }}</td>
 
                                         <td>{{ $p->email }}</td>
                                         <td>
                                             <?php
-                                            if ( $p->status == ("enable")) {
+                                            if ($p->status == ("enable")) {
                                                 echo '<label class="badge badge-info">Enable</label>';
-
-                                            }else{
+                                            } else {
                                                 echo '<label class="badge badge-danger">Disable</label>';
                                             }
                                             ?>
-                                            
+
                                         </td>
                                         <td>
-                                            <button class="btn btn-rounded btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">Info </button>
+                                            <button class="btn btn-rounded btn-info" data-bs-toggle="modal" data-bs-target="#showModal{{ $p->id }}">Info </button>
                                         </td>
                                         <td>
-                                            <a href="<?= ("Admin/editUser") ?>"><button class="btn btn-outline-primary bg-white bg-white mb-2 mb-md-0"> Edit Akun </button></a>
-                                            <button class="btn btn-danger"> Disable Akun </button>
+                                            <a href="editUser/{{ $p->id }}"><button class="btn btn-outline-primary bg-white bg-white mb-2 mb-md-0"> Edit Akun </button></a>
+                                            <?php
+                                            if ($p->status == ("enable")) {
+                                                echo "<a href='/Admin/disable/$p->id'><button class='btn btn-danger mb-2 mb-md-0'> Disable Akun </button></a>";
+                                            } else {
+                                                echo "<a href='/Admin/enable/$p->id'><button class='btn btn-success mb-2 mb-md-0'> Enable Akun </button></a>";
+                                            }
+                                            ?>
+
                                         </td>
-                                    </tr>                                  
+                                    </tr>
                                 </tbody>
                                 @endforeach
                             </table>
@@ -63,12 +69,12 @@
                 </div>
             </div>
         </div>
-
     </div>
     <!-- content-wrapper ends -->
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    @foreach($user as $p)
+    <div class="modal fade" id="showModal{{ $p->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -80,31 +86,28 @@
                         <table class="table table-hover">
                             <tbody>
                                 <tr>
-                                    <td>
-                                        Nama Akun
-                                    </td>
-                                    <td>ITSA</td>
+                                    <td>Nama Akun</td>
+                                    <td>{{ $p->name }}</td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        Email
-                                    </td>
-                                    <td>itsa@bem.pcr.ac.id</td>
+                                    <td>Email</td>
+                                    <td>{{ $p->email }}</td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        Tanggal dibuat
-                                    </td>
-                                    <td>12 May 2000</td>
+                                    <td>Tanggal Dibuat</td>
+                                    <td>{{ $p->created_at }}</td>
                                 </tr>
                                 <tr>
+                                    <td>Status</td>
                                     <td>
-                                        Status
-                                    </td>
-                                    <td>
+                                        @if ($p->status == ("enable"))
                                         <label class="badge badge-info">Enable</label>
+                                        @else
+                                        <label class="badge badge-danger">Disable</label>
+                                        @endif
                                     </td>
                                 </tr>
+                                <!-- ... (informasi lainnya) ... -->
                             </tbody>
                         </table>
                     </div>
@@ -115,4 +118,5 @@
             </div>
         </div>
     </div>
+    @endforeach
     @endsection

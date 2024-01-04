@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 
 class AdminController extends Controller
 {
@@ -13,10 +17,18 @@ class AdminController extends Controller
     public function index()
     {
         // mengambil data dari table user
-        $user = DB::table('user')->get();
+        $user = DB::table('users')->where('role', 'like', 'ukm')->get();
 
         // mengirim data pegawai ke view index
-        return view('admin/user', ['user' => $user]);
+        return view('Admin/user', ['user' => $user]);
+    }
+    public function dosen()
+    {
+        // mengambil data dari table user
+        $user = DB::table('users')->where('role', 'like', 'dosen')->get();
+
+        // mengirim data pegawai ke view index
+        return view('Admin/kemahasiswaan', ['user' => $user]);
     }
 
     /**
@@ -32,16 +44,25 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        // insert data ke table pegawai
-        DB::table('user')->insert([
-            'nama' => $request->nama,
-            'password' => $request->password,
-            'email' => $request->email,
-            'role' => $request->role,
-            'status' => "enable",
+        $request->validate([
+            'nama' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required',
+            'role' => 'required',
         ]);
-        // alihkan halaman ke halaman pegawai
-        return redirect('/Admin/kemahasiswaan');
+
+        $data['name'] = $request->nama;
+        $data['password'] = Hash::make($request->password);
+        $data['email'] = $request->email;
+        $data['role'] = $request->role;
+        $data['status'] = "enable";
+        $user = User::create($data);
+
+        if (!$user) {
+            return redirect(route('addUser'))->with("error", "Detail registrasi tidak valid");
+        }
+
+        return redirect(route('addUser'))->with("Success", "Registrasi akun berhasil");
     }
 
     /**
@@ -58,9 +79,9 @@ class AdminController extends Controller
     public function edit(string $id)
     {
         // mengambil data user berdasarkan id yang dipilih
-        $user = DB::table('user')->where('user_id', $id)->get();
+        $user = DB::table('users')->where('id', $id)->get();
         // passing data pegawai yang didapat ke view edit.blade.php
-        return view('editUser', ['user' => $user]);
+        return view('admin/editUser', ['user' => $user]);
     }
 
     /**
@@ -69,27 +90,54 @@ class AdminController extends Controller
     public function update(Request $request)
     {
         // update data ke table user
-        DB::table('user')->where('user_id',$request->id)->update([
-            'nama' => $request->nama,
+        DB::table('users')->where('id', $request->id)->update([
+            'name' => $request->nama,
             'password' => $request->password,
             'email' => $request->email,
             'role' => $request->role,
             'status' => $request->status,
         ]);
         // alihkan halaman ke halaman pegawai
-        return redirect('/admin');
+        if ($request->role == "ukm") {
+            return redirect(route('user'));
+        }else{
+            return redirect(route('dosen'));
+        }
+        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function disable(string $id)
     {
+        // mengambil data user berdasarkan id yang dikirim
+        $user = User::find($id);
+
+        // update status user menjadi disable
+        $user->status = 'disable';
+        $user->save();
+
+        // kembali ke halaman user dengan pesan berhasil
+        return Redirect::back()->with('success', 'User berhasil di-disable');
+
         // menghapus data user berdasarkan id yang dipilih
-        DB::table('user')->where('user_id', $id)->delete();
+        // DB::table('user')->where('user_id', $id)->delete();
 
         // alihkan halaman ke halaman user
-        return redirect('/admin');
+        // return redirect('/admin');
+    }
+
+    public function enable(string $id){
+        // mengambil data user berdasarkan id yang dikirim
+        $user = User::find($id);
+
+        // update status user menjadi disable
+        $user->status = 'enable';
+        $user->save();
+
+        // kembali ke halaman user dengan pesan berhasil
+        return Redirect::back()->with('success', 'User berhasil di-enable');
     }
 
     // method untuk menampilkan view form tambah pegawai
@@ -98,6 +146,4 @@ class AdminController extends Controller
         // memanggil view tambah
         return view('tambahUser');
     }
-
-    
 }
